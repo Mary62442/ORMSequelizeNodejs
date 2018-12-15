@@ -11,10 +11,9 @@ const sequelize = new Sequelize('postgres', 'postgres', 'secret', {
     min: 0,
     acquire: 30000,
     idle: 10000
-  },
-  
+  }  
 });
-
+const Op = Sequelize.Op;
 
 const app = express();
 const allowCrossDomain = function (req, res, next) {      
@@ -29,11 +28,12 @@ const allowCrossDomain = function (req, res, next) {
 app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
-sequelize.authenticate().then(() => {
+//To check the connection is active, uncomment this
+/* sequelize.authenticate().then(() => {
 console.log('Connection has been established successfully.');
 }).catch(err => {
 console.error('Unable to connect to the database:', err);
-});
+}); */
  
 
 let syncTable =  (tableNametoSync) => {
@@ -66,7 +66,7 @@ let createTableValues = (tableName) => {
     ]).catch((err) => console.log(err));    
 }
 
-let sequelizeTable = async () => {
+exports.sequelizePeopleTable = async () => {
     let Person = sequelize.define( 'person', {
         firstName: {type:Sequelize.STRING, allowNull:false, validate:{len: [2,30]}},
         lastName: {type:Sequelize.STRING, allowNull:false, validate:{len: [2,30]}},
@@ -75,11 +75,9 @@ let sequelizeTable = async () => {
         annualEarnings: Sequelize.DOUBLE    
     }); 
     await syncTable(Person);
-    await createTableValues(Person);  
-    console.log(await Person.findAll());
-    return;
+    await createTableValues(Person); 
+    return Person;
 }
 
-sequelizeTable();
 
 
