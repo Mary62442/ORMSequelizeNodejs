@@ -29,50 +29,57 @@ const allowCrossDomain = function (req, res, next) {
 app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
+sequelize.authenticate().then(() => {
+console.log('Connection has been established successfully.');
+}).catch(err => {
+console.error('Unable to connect to the database:', err);
+});
+ 
+
+let syncTable =  (tableNametoSync) => {
+    return tableNametoSync.sync({force:true}).catch((err) => console.log(err));     
+}
+
+let createTableValues = (tableName) => {
+   return tableName.bulkCreate([
+        {
+            firstName: 'Jean',
+            lastName: 'Dupont',
+            age:43,    
+            profession : "CEO",
+            annualEarnings:300000.00
+        },
+        { 
+            firstName: 'Lara',
+            lastName: 'Finnegan',
+            age:21,    
+            profession : "Web Developer",
+            annualEarnings:45000.00 
+        },
+        { 
+            firstName: 'Jeremy',
+            lastName: 'Stanley',
+            age:56,    
+            profession : "Tech Lead",
+            annualEarnings:90000.00
+        }       
+    ]).catch((err) => console.log(err));    
+}
+
+let sequelizeTable = async () => {
+    let Person = sequelize.define( 'person', {
+        firstName: {type:Sequelize.STRING, allowNull:false, validate:{len: [2,30]}},
+        lastName: {type:Sequelize.STRING, allowNull:false, validate:{len: [2,30]}},
+        age: Sequelize.INTEGER,
+        profession: Sequelize.STRING,    
+        annualEarnings: Sequelize.DOUBLE    
+    }); 
+    await syncTable(Person);
+    await createTableValues(Person);  
+    console.log(await Person.findAll());
+    return;
+}
+
+sequelizeTable();
 
 
-  let Person = sequelize.define( 'person', {
-    firstName: {type:Sequelize.STRING, allowNull:false, validate:{len: [2,30]}},
-    lastName: {type:Sequelize.STRING, allowNull:false, validate:{len: [2,30]}},
-    age: Sequelize.INTEGER,
-    profession: Sequelize.STRING,    
-    annualEarnings: Sequelize.DOUBLE    
-  });
-
-  Person.sync({force:true}).then( () => {
-    Person.create({
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        age:43,    
-        profession : "CEO",
-        annualEarnings:300000.00
-    });
-
-    Person.bulkCreate([
-        { firstName: 'Lara',
-        lastName: 'Finnegan',
-        age:21,    
-        profession : "Web Developer",
-        annualEarnings:45000.00 },
-        { firstName: 'Jeremy',
-        lastName: 'Stanley',
-        age:56,    
-        profession : "Tech Lead",
-        annualEarnings:90000.00}       
-    ]).then(() => { 
-        return Person.findAll();
-    }).then(people => {
-        console.log(people) 
-    });
-
-    return null;
-  });
-  
