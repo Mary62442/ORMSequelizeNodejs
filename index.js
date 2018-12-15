@@ -57,21 +57,16 @@ sequelize
     });
 
     Person.bulkCreate([
-        { firstName: 'Maria',
-        lastName: 'Burlando',
+        { firstName: 'Lara',
+        lastName: 'Finnegan',
         age:21,    
         profession : "Web Developer",
         annualEarnings:45000.00 },
-        { firstName: 'Diego',
-        lastName: 'Burlando',
+        { firstName: 'Jeremy',
+        lastName: 'Stanley',
         age:56,    
         profession : "Tech Lead",
-        annualEarnings:90000.00},
-        { firstName: 'Monica',
-        lastName: 'Lanzavecchia',
-        age:51,    
-        profession : "Schiava del Vecchio",
-        annualEarnings:0 }
+        annualEarnings:90000.00}       
     ]).then(() => { 
         return Person.findAll();
     }).then(people => {
